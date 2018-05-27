@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
+
 
 public class UnityChanController : MonoBehaviour
 {
@@ -16,10 +18,20 @@ public class UnityChanController : MonoBehaviour
     //動きを減速させる係数
     private float coefficient = 0.95f;
     //ジャンプするための力
-    private float upForce = 1000.0f;
+    private float upForce = 500.0f;
 
     //ゲーム終了の判定（追加）
     private bool isEnd = false;
+
+    //ゲーム終了時に表示するテキスト(追加)
+    private GameObject stateText;
+
+    //スコアを表示するテキスト(追加)
+    private GameObject scoreText;
+
+    //得点
+    private int score = 0;
+
 
     // Use this for initialization
     void Start()
@@ -33,6 +45,12 @@ public class UnityChanController : MonoBehaviour
 
         //Rigidbodyコンポーネントを取得
         this.myRigidbody = GetComponent<Rigidbody>();
+
+        //シーン中のstateTextオブジェクトを取得(追加)
+        this.stateText = GameObject.Find("GameResultText");
+
+        //シーン中のscoreTextオブジェクトを取得(追加)
+        this.scoreText = GameObject.Find("ScoreText");
     }
 
     // Update is called once per frame
@@ -82,17 +100,33 @@ public class UnityChanController : MonoBehaviour
         if (other.gameObject.tag == "CarTag" || other.gameObject.tag == "TrafficConeTag")
         {
             this.isEnd = true;
+
+            //stateTextにGame Overを表示(追加)
+            this.stateText.GetComponent<Text>().text = "GAME OVER";
         }
         //コインに衝突した場合（追加）
         if (other.gameObject.tag == "CoinTag")
         {
+            //スコアを加算(追加)
+            this.score += 10;
+
+            //ScoreText獲得した点数を表示(追加)
+            this.scoreText.GetComponent<Text>().text = "Score " + this.score + "pt";
+  
+            //パーティクルを再生
+            GetComponent<ParticleSystem>().Play();
+
             //接触したコインのオブジェクトを破棄（追加）
             Destroy(other.gameObject);
+            
         }
         //ゴール地点に到達した場合（追加）
         if (other.gameObject.tag == "GoalTag")
         {
             this.isEnd = true;
+
+            //stateTextにGAME CLEARを表示(追加)
+            this.stateText.GetComponent<Text>().text = "CLEAR!!";
         }
     }
 }
